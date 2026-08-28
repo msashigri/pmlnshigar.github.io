@@ -1,0 +1,74 @@
+@import "tailwindcss";
+
+@layer base {
+  body {
+    font-family: 'Inter', system-ui, sans-serif;
+  }
+  
+  h1, h2, .editorial-heading {
+    font-family: 'Playfair Display', Georgia, serif;
+  }
+}
+
+.font-serif-editorial {
+  font-family: 'Playfair Display', Georgia, serif;
+}
+
+/* Official PMLN Green and Crisp White Palette */
+.bg-pmln-green {
+  background-color: #006633;
+}
+
+.text-pmln-green {
+  color: #006633;
+}
+
+.border-pmln-green {
+  border-color: #006633;
+}
+
+.bg-pmln-white {
+  background-color: #ffffff;
+}
+
+.text-pmln-white {
+  color: #ffffff;
+}
+
+.border-pmln-white {
+  border-color: #ffffff;
+}
+
+/* Green & White gradient effect */
+.green-gradient-text {
+  background: linear-gradient(135deg, #10b981 0%, #006633 50%, #047857 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.white-green-gradient-text {
+  background: linear-gradient(135deg, #ffffff 0%, #e2e8f0 50%, #10b981 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.green-gradient-bg {
+  background: linear-gradient(135deg, #006633 0%, #047857 50%, #065f46 100%);
+}
+
+.editorial-card-frame {
+  border: 1px solid rgba(0, 102, 51, 0.3);
+  position: relative;
+}
+
+.editorial-card-frame::after {
+  content: '';
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  right: 3px;
+  bottom: 3px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  pointer-events: none;
+}
+
