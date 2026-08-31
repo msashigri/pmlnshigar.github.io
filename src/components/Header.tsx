@@ -1,11 +1,11 @@
 import React, { useState } from 'react';
-import { Menu, X, ChevronDown, User, HeartHandshake, Flag, Award, BookOpen, Layers, Newspaper, Calendar, Image as ImageIcon, Phone, Home, KeyRound, ShieldCheck } from 'lucide-react';
+import { Menu, X, ChevronDown, User, HeartHandshake, Flag, Award, BookOpen, Layers, Newspaper, Calendar, Image as ImageIcon, Phone, Home, ShieldCheck } from 'lucide-react';
 import { useApp } from '../context/AppContext';
 import { Page } from '../types';
 import { APP_IMAGES } from '../assets/images';
 
 export const Header: React.FC = () => {
-  const { currentPage, setCurrentPage, isAdmin, currentMemberUser } = useApp();
+  const { currentPage, setCurrentPage, isAdmin } = useApp();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [megaMenuOpen, setMegaMenuOpen] = useState(false);
 
@@ -77,22 +77,6 @@ export const Header: React.FC = () => {
               );
             })}
 
-            {/* Member Portal Button */}
-            <button
-              onClick={() => handleNavClick('member-portal')}
-              className={`px-3 py-2 rounded-md text-sm font-bold transition-all flex items-center space-x-1.5 ${
-                currentPage === 'member-portal'
-                  ? 'bg-[#006633] text-white shadow-sm'
-                  : 'text-emerald-800 dark:text-emerald-300 hover:bg-emerald-50 dark:hover:bg-emerald-950/50'
-              }`}
-            >
-              <KeyRound className="w-3.5 h-3.5" />
-              <span>{currentMemberUser ? 'My Portal' : 'Member Portal'}</span>
-              {currentMemberUser && (
-                <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
-              )}
-            </button>
-
             {/* More / Mega Menu dropdown button */}
             <div className="relative">
               <button
@@ -109,19 +93,6 @@ export const Header: React.FC = () => {
                   <div className="text-xs font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider px-3 py-1">
                     Get Involved
                   </div>
-
-                  <button
-                    onClick={() => handleNavClick('member-portal')}
-                    className="w-full text-left px-3 py-2.5 rounded-lg bg-emerald-50/70 dark:bg-emerald-950/60 hover:bg-emerald-100 dark:hover:bg-emerald-900/80 flex items-center space-x-3 transition-colors text-slate-800 dark:text-slate-100 font-medium text-sm mb-1"
-                  >
-                    <div className="w-8 h-8 rounded-lg bg-[#006633] text-white flex items-center justify-center">
-                      <KeyRound className="w-4 h-4" />
-                    </div>
-                    <div>
-                      <div className="font-bold text-emerald-900 dark:text-emerald-300">Member & Volunteer Portal</div>
-                      <div className="text-xs text-slate-500 dark:text-slate-400">Card print, stories & media desk</div>
-                    </div>
-                  </button>
 
                   <button
                     onClick={() => handleNavClick('join')}
@@ -182,14 +153,6 @@ export const Header: React.FC = () => {
           {/* Action CTAs */}
           <div className="hidden sm:flex items-center space-x-3">
             <button
-              onClick={() => handleNavClick('member-portal')}
-              className="px-3.5 py-2 rounded-lg font-bold text-xs uppercase tracking-wider text-[#006633] dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/50 border border-emerald-300 dark:border-emerald-800 hover:bg-emerald-100 dark:hover:bg-emerald-900/60 transition-colors flex items-center space-x-1"
-            >
-              <KeyRound className="w-3.5 h-3.5" />
-              <span>{currentMemberUser ? 'Portal' : 'Member Login'}</span>
-            </button>
-
-            <button
               onClick={() => handleNavClick('join')}
               className="px-4 py-2 rounded-lg font-bold text-xs uppercase tracking-wider text-white bg-[#006633] hover:bg-[#004d26] shadow-md shadow-emerald-900/20 hover:shadow-lg transition-all flex items-center space-x-1.5"
             >
@@ -200,13 +163,6 @@ export const Header: React.FC = () => {
 
           {/* Mobile Menu Toggle Button */}
           <div className="flex items-center space-x-2 xl:hidden">
-            <button
-              onClick={() => handleNavClick('member-portal')}
-              className="px-2.5 py-1.5 rounded-lg text-xs font-bold text-emerald-800 dark:text-emerald-300 bg-emerald-100 dark:bg-emerald-950 sm:hidden flex items-center space-x-1"
-            >
-              <KeyRound className="w-3.5 h-3.5" />
-              <span>Portal</span>
-            </button>
             <button
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
               className="p-2 rounded-lg text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 focus:outline-none"
@@ -222,18 +178,6 @@ export const Header: React.FC = () => {
       {mobileMenuOpen && (
         <div className="xl:hidden bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 px-4 pt-2 pb-6 space-y-1 animate-in slide-in-from-top duration-200">
           
-          <button
-            onClick={() => handleNavClick('member-portal')}
-            className={`w-full text-left px-4 py-3 rounded-xl text-base font-bold transition-colors flex items-center space-x-3 mb-2 ${
-              currentPage === 'member-portal'
-                ? 'bg-[#006633] text-white'
-                : 'bg-emerald-100 dark:bg-emerald-950/70 text-emerald-900 dark:text-emerald-300'
-            }`}
-          >
-            <KeyRound className="w-5 h-5" />
-            <span>Member & Volunteer Portal</span>
-          </button>
-
           {navItems.map((item) => (
             <button
               key={item.page}

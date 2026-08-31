@@ -10,7 +10,7 @@ export const GalleryPage: React.FC = () => {
 
   const categories = ['All', 'Rallies', 'Speeches', 'Development', 'Youth', 'Culture'];
 
-  const filteredItems = galleryList.filter(item => 
+  const filteredItems = (galleryList || []).filter(item => 
     activeCategory === 'All' || item.category === activeCategory
   );
 

@@ -10,11 +10,11 @@ export const NewsPage: React.FC = () => {
 
   const categories = ['All', 'Press Releases', 'Events', 'Development Projects', 'Political Activities', 'Announcements'];
 
-  const filteredNews = newsList.filter(item => {
+  const filteredNews = (newsList || []).filter(item => {
     const matchesCategory = activeCategory === 'All' || item.category === activeCategory;
-    const matchesSearch = item.title.toLowerCase().includes(searchTerm.toLowerCase()) || 
-                          item.summary.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                          item.tags.some(t => t.toLowerCase().includes(searchTerm.toLowerCase()));
+    const matchesSearch = (item.title || '').toLowerCase().includes(searchTerm.toLowerCase()) || 
+                          (item.summary || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
+                          (item.tags || []).some(t => (t || '').toLowerCase().includes(searchTerm.toLowerCase()));
     return matchesCategory && matchesSearch;
   });
 

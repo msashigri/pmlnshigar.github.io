@@ -4,11 +4,14 @@ import {
   Layers, Users, HeartHandshake, CreditCard, Mail, Settings, Plus, 
   Trash2, Check, Download, Eye, Sun, Moon, BarChart2, TrendingUp, CheckCircle,
   LogOut, Globe, Key, Lock, User, Copy, CheckCheck, AlertCircle, FileCheck, MessageSquare,
-  CheckCircle2, XCircle, Clock, Send
+  CheckCircle2, XCircle, Clock, Send, Edit, UserCheck
 } from 'lucide-react';
 import { useApp } from '../context/AppContext';
 import { APP_IMAGES } from '../assets/images';
 import { SuperAdminLogin } from '../components/SuperAdminLogin';
+import { EditMemberModal } from '../components/EditMemberModal';
+import { EditVolunteerModal } from '../components/EditVolunteerModal';
+import { MemberRecord, VolunteerRecord } from '../types';
 
 export const AdminDashboard: React.FC = () => {
   const { 
@@ -18,12 +21,17 @@ export const AdminDashboard: React.FC = () => {
     galleryList, addGalleryItem, deleteGalleryItem,
     projectsList, addProjectItem, deleteProjectItem, updateProjectProgress,
     membersList, volunteersList, donationsList, messagesList, markMessageRead,
+    updateMemberAdmin, deleteMemberAdmin, updateVolunteerAdmin, deleteVolunteerAdmin,
     memberPosts, approveMemberPost, rejectMemberPost, deleteMemberPost,
     mediaHeadMessages, replyMediaHeadMessage, markMediaHeadMessageRead,
     isDarkMode, toggleDarkMode, addToast, setSelectedMemberForCard
   } = useApp();
 
   const [activeTab, setActiveTab] = useState<'overview' | 'news' | 'events' | 'gallery' | 'projects' | 'members' | 'volunteers' | 'donations' | 'messages' | 'member-posts' | 'media-inquiries' | 'settings'>('overview');
+  const [editingMember, setEditingMember] = useState<MemberRecord | null>(null);
+  const [editingVolunteer, setEditingVolunteer] = useState<VolunteerRecord | null>(null);
+  const [memberSearchTerm, setMemberSearchTerm] = useState('');
+  const [volunteerSearchTerm, setVolunteerSearchTerm] = useState('');
   const [postStatusFilter, setPostStatusFilter] = useState<'All' | 'pending' | 'approved' | 'rejected'>('All');
   const [rejectModalPostId, setRejectModalPostId] = useState<string | null>(null);
   const [rejectReason, setRejectReason] = useState('');
@@ -228,24 +236,24 @@ export const AdminDashboard: React.FC = () => {
           { id: 'overview', label: 'Overview', icon: LayoutDashboard },
           { 
             id: 'member-posts', 
-            label: `Member Posts (${memberPosts.filter(p => p.status === 'pending').length} Pending)`, 
+            label: `Member Posts (${(memberPosts || []).filter(p => (p.status || '').toLowerCase() === 'pending').length} Pending)`, 
             icon: FileCheck,
-            badge: memberPosts.filter(p => p.status === 'pending').length > 0
+            badge: (memberPosts || []).filter(p => (p.status || '').toLowerCase() === 'pending').length > 0
           },
           { 
             id: 'media-inquiries', 
-            label: `Media Inquiries (${mediaHeadMessages.filter(m => !m.isRead).length} New)`, 
+            label: `Media Inquiries (${(mediaHeadMessages || []).filter(m => !m.isRead).length} New)`, 
             icon: MessageSquare,
-            badge: mediaHeadMessages.filter(m => !m.isRead).length > 0
+            badge: (mediaHeadMessages || []).filter(m => !m.isRead).length > 0
           },
-          { id: 'news', label: `News (${newsList.length})`, icon: Newspaper },
-          { id: 'events', label: `Events (${eventsList.length})`, icon: Calendar },
-          { id: 'projects', label: `Projects (${projectsList.length})`, icon: Layers },
-          { id: 'gallery', label: `Gallery (${galleryList.length})`, icon: ImageIcon },
-          { id: 'members', label: `Members (${membersList.length})`, icon: Users },
-          { id: 'volunteers', label: `Volunteers (${volunteersList.length})`, icon: HeartHandshake },
+          { id: 'news', label: `News (${(newsList || []).length})`, icon: Newspaper },
+          { id: 'events', label: `Events (${(eventsList || []).length})`, icon: Calendar },
+          { id: 'projects', label: `Projects (${(projectsList || []).length})`, icon: Layers },
+          { id: 'gallery', label: `Gallery (${(galleryList || []).length})`, icon: ImageIcon },
+          { id: 'members', label: `Members (${(membersList || []).length})`, icon: Users },
+          { id: 'volunteers', label: `Volunteers (${(volunteersList || []).length})`, icon: HeartHandshake },
           { id: 'donations', label: 'Donations', icon: CreditCard },
-          { id: 'messages', label: `Public Inquiries (${messagesList.length})`, icon: Mail },
+          { id: 'messages', label: `Public Inquiries (${(messagesList || []).length})`, icon: Mail },
           { id: 'settings', label: 'Security & Settings', icon: Settings },
         ].map((tab) => (
           <button
@@ -296,7 +304,7 @@ export const AdminDashboard: React.FC = () => {
             <div className="bg-white dark:bg-slate-900 p-5 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm space-y-2">
               <div className="text-xs font-bold text-slate-400 uppercase">Pending Inquiries</div>
               <div className="text-3xl font-black text-rose-600 dark:text-rose-400">
-                {messagesList.filter(m => !m.isRead).length}
+                {(messagesList || []).filter(m => !m.isRead).length}
               </div>
               <div className="text-[11px] text-slate-500">Awaiting secretariat response</div>
             </div>
@@ -453,51 +461,241 @@ export const AdminDashboard: React.FC = () => {
       {/* TAB CONTENT: MEMBERS MANAGEMENT */}
       {activeTab === 'members' && (
         <div className="bg-white dark:bg-slate-900 p-6 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-sm space-y-4">
-          <div className="flex items-center justify-between">
-            <h3 className="font-black text-base text-slate-900 dark:text-white">Registered PMLN Shigar Members</h3>
-            <button
-              onClick={exportMembersJSON}
-              className="px-3.5 py-1.5 rounded-lg bg-emerald-700 text-white font-bold text-xs shadow hover:bg-emerald-600 flex items-center space-x-1"
-            >
-              <Download className="w-3.5 h-3.5" />
-              <span>Export CSV/JSON</span>
-            </button>
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+            <div>
+              <h3 className="font-black text-base text-slate-900 dark:text-white">Registered PMLN Shigar Members</h3>
+              <p className="text-xs text-slate-500">Edit member records, photos, passwords, usernames, or view membership cards.</p>
+            </div>
+            <div className="flex items-center space-x-2">
+              <input
+                type="text"
+                value={memberSearchTerm}
+                onChange={(e) => setMemberSearchTerm(e.target.value)}
+                placeholder="Search member by name, CNIC, village..."
+                className="px-3 py-1.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-xs text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-emerald-500"
+              />
+              <button
+                onClick={exportMembersJSON}
+                className="px-3.5 py-1.5 rounded-xl bg-emerald-700 text-white font-bold text-xs shadow hover:bg-emerald-600 flex items-center space-x-1 whitespace-nowrap"
+              >
+                <Download className="w-3.5 h-3.5" />
+                <span>Export CSV/JSON</span>
+              </button>
+            </div>
           </div>
 
           <div className="overflow-x-auto">
             <table className="w-full text-left text-xs border-collapse">
               <thead>
                 <tr className="border-b border-slate-200 dark:border-slate-800 text-slate-400 uppercase font-bold text-[10px]">
-                  <th className="py-3 px-2">Member ID</th>
-                  <th className="py-3 px-2">Full Name</th>
+                  <th className="py-3 px-2">Member</th>
+                  <th className="py-3 px-2">Username / Card ID</th>
                   <th className="py-3 px-2">CNIC</th>
-                  <th className="py-3 px-2">Village</th>
+                  <th className="py-3 px-2">Village / Union</th>
                   <th className="py-3 px-2">Mobile</th>
                   <th className="py-3 px-2">Joined</th>
-                  <th className="py-3 px-2">Actions</th>
+                  <th className="py-3 px-2 text-right">Admin Actions</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-100 dark:divide-slate-800 font-semibold text-slate-800 dark:text-slate-200">
-                {membersList.map((mem) => (
-                  <tr key={mem.id} className="hover:bg-slate-50 dark:hover:bg-slate-800/50">
-                    <td className="py-3 px-2 font-mono text-emerald-700 dark:text-emerald-400">{mem.membershipNo}</td>
-                    <td className="py-3 px-2">{mem.fullName}</td>
-                    <td className="py-3 px-2">{mem.cnic}</td>
-                    <td className="py-3 px-2">{mem.village}</td>
-                    <td className="py-3 px-2">{mem.mobile}</td>
-                    <td className="py-3 px-2">{mem.joinedDate}</td>
-                    <td className="py-3 px-2">
-                      <button
-                        onClick={() => setSelectedMemberForCard(mem)}
-                        className="px-2.5 py-1 rounded bg-emerald-100 dark:bg-emerald-950 text-[#006633] dark:text-emerald-400 font-bold hover:underline"
-                      >
-                        View Card
-                      </button>
-                    </td>
-                  </tr>
-                ))}
+                {(membersList || [])
+                  .filter((m) => {
+                    if (!memberSearchTerm.trim()) return true;
+                    const query = memberSearchTerm.toLowerCase();
+                    return (
+                      (m.fullName || '').toLowerCase().includes(query) ||
+                      (m.username || '').toLowerCase().includes(query) ||
+                      (m.cnic || '').toLowerCase().includes(query) ||
+                      (m.village || '').toLowerCase().includes(query) ||
+                      (m.mobile || '').toLowerCase().includes(query) ||
+                      (m.membershipNo || '').toLowerCase().includes(query)
+                    );
+                  })
+                  .map((mem) => (
+                    <tr key={mem.id} className="hover:bg-slate-50 dark:hover:bg-slate-800/50">
+                      <td className="py-3 px-2">
+                        <div className="flex items-center space-x-2.5">
+                          {mem.photoUrl ? (
+                            <img
+                              src={mem.photoUrl}
+                              alt={mem.fullName}
+                              className="w-8 h-8 rounded-full object-cover border border-emerald-500/40"
+                              referrerPolicy="no-referrer"
+                            />
+                          ) : (
+                            <div className="w-8 h-8 rounded-full bg-emerald-100 dark:bg-emerald-950 text-[#006633] dark:text-emerald-400 flex items-center justify-center font-black text-xs">
+                              {mem.fullName ? mem.fullName[0] : 'M'}
+                            </div>
+                          )}
+                          <div>
+                            <div className="font-bold text-slate-900 dark:text-white">{mem.fullName}</div>
+                            <div className="text-[10px] text-slate-400">Father: {mem.fatherName || 'N/A'}</div>
+                          </div>
+                        </div>
+                      </td>
+                      <td className="py-3 px-2">
+                        <div className="font-mono text-emerald-700 dark:text-emerald-400 font-bold">{mem.membershipNo}</div>
+                        <div className="text-[10px] text-slate-400 font-mono">@{mem.username}</div>
+                      </td>
+                      <td className="py-3 px-2">{mem.cnic}</td>
+                      <td className="py-3 px-2">{mem.village} {mem.unionCouncil ? `(${mem.unionCouncil})` : ''}</td>
+                      <td className="py-3 px-2">{mem.mobile}</td>
+                      <td className="py-3 px-2 text-slate-500">{mem.joinedDate}</td>
+                      <td className="py-3 px-2 text-right">
+                        <div className="flex items-center justify-end space-x-1.5">
+                          <button
+                            onClick={() => setSelectedMemberForCard(mem)}
+                            className="px-2.5 py-1 rounded-lg bg-emerald-100 dark:bg-emerald-950 text-[#006633] dark:text-emerald-400 font-bold hover:bg-emerald-200 transition-colors flex items-center space-x-1"
+                            title="View Membership ID Card"
+                          >
+                            <Eye className="w-3.5 h-3.5" />
+                            <span>Card</span>
+                          </button>
+                          <button
+                            onClick={() => setEditingMember(mem)}
+                            className="px-2.5 py-1 rounded-lg bg-blue-100 dark:bg-blue-950/80 text-blue-700 dark:text-blue-300 font-bold hover:bg-blue-200 dark:hover:bg-blue-900 transition-colors flex items-center space-x-1"
+                            title="Edit Data, Photo & Password"
+                          >
+                            <Edit className="w-3.5 h-3.5" />
+                            <span>Edit</span>
+                          </button>
+                          <button
+                            onClick={() => {
+                              if (confirm(`Are you sure you want to delete member ${mem.fullName}?`)) {
+                                deleteMemberAdmin(mem.id);
+                              }
+                            }}
+                            className="p-1 rounded-lg text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-950/60 transition-colors"
+                            title="Delete Member"
+                          >
+                            <Trash2 className="w-3.5 h-3.5" />
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
               </tbody>
             </table>
+            {(membersList || []).length === 0 && (
+              <div className="py-8 text-center text-slate-400 text-xs">No registered members found.</div>
+            )}
+          </div>
+        </div>
+      )}
+
+      {/* TAB CONTENT: VOLUNTEERS MANAGEMENT */}
+      {activeTab === 'volunteers' && (
+        <div className="bg-white dark:bg-slate-900 p-6 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-sm space-y-4">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+            <div>
+              <h3 className="font-black text-base text-slate-900 dark:text-white">Registered Youth Force & Volunteers</h3>
+              <p className="text-xs text-slate-500">Edit volunteer profiles, skill sets, photo, passwords, or manage volunteer roles.</p>
+            </div>
+            <div className="flex items-center space-x-2">
+              <input
+                type="text"
+                value={volunteerSearchTerm}
+                onChange={(e) => setVolunteerSearchTerm(e.target.value)}
+                placeholder="Search volunteer by name, skill, village..."
+                className="px-3 py-1.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-xs text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-emerald-500"
+              />
+            </div>
+          </div>
+
+          <div className="overflow-x-auto">
+            <table className="w-full text-left text-xs border-collapse">
+              <thead>
+                <tr className="border-b border-slate-200 dark:border-slate-800 text-slate-400 uppercase font-bold text-[10px]">
+                  <th className="py-3 px-2">Volunteer</th>
+                  <th className="py-3 px-2">Username / Volunteer ID</th>
+                  <th className="py-3 px-2">Village</th>
+                  <th className="py-3 px-2">Area of Interest</th>
+                  <th className="py-3 px-2">Contact</th>
+                  <th className="py-3 px-2">Availability</th>
+                  <th className="py-3 px-2 text-right">Admin Actions</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-slate-100 dark:divide-slate-800 font-semibold text-slate-800 dark:text-slate-200">
+                {(volunteersList || [])
+                  .filter((v) => {
+                    if (!volunteerSearchTerm.trim()) return true;
+                    const query = volunteerSearchTerm.toLowerCase();
+                    return (
+                      (v.fullName || '').toLowerCase().includes(query) ||
+                      (v.username || '').toLowerCase().includes(query) ||
+                      (v.village || '').toLowerCase().includes(query) ||
+                      (v.areaOfInterest || '').toLowerCase().includes(query) ||
+                      (v.mobile || '').toLowerCase().includes(query) ||
+                      (v.volunteerId || '').toLowerCase().includes(query)
+                    );
+                  })
+                  .map((vol) => (
+                    <tr key={vol.id} className="hover:bg-slate-50 dark:hover:bg-slate-800/50">
+                      <td className="py-3 px-2">
+                        <div className="flex items-center space-x-2.5">
+                          {vol.photoUrl ? (
+                            <img
+                              src={vol.photoUrl}
+                              alt={vol.fullName}
+                              className="w-8 h-8 rounded-full object-cover border border-emerald-500/40"
+                              referrerPolicy="no-referrer"
+                            />
+                          ) : (
+                            <div className="w-8 h-8 rounded-full bg-emerald-100 dark:bg-emerald-950 text-[#006633] dark:text-emerald-400 flex items-center justify-center font-black text-xs">
+                              {vol.fullName ? vol.fullName[0] : 'V'}
+                            </div>
+                          )}
+                          <div>
+                            <div className="font-bold text-slate-900 dark:text-white">{vol.fullName}</div>
+                            <div className="text-[10px] text-slate-400 font-mono">Age: {vol.age || 'N/A'} • {vol.qualification || 'Student'}</div>
+                          </div>
+                        </div>
+                      </td>
+                      <td className="py-3 px-2">
+                        <div className="font-mono text-emerald-700 dark:text-emerald-400 font-bold">{vol.volunteerId}</div>
+                        <div className="text-[10px] text-slate-400 font-mono">@{vol.username}</div>
+                      </td>
+                      <td className="py-3 px-2">{vol.village}</td>
+                      <td className="py-3 px-2">
+                        <span className="px-2 py-0.5 rounded-md bg-emerald-50 dark:bg-emerald-950/60 text-emerald-800 dark:text-emerald-300 font-medium text-[11px] border border-emerald-200 dark:border-emerald-800">
+                          {vol.areaOfInterest || 'General Support'}
+                        </span>
+                      </td>
+                      <td className="py-3 px-2">
+                        <div>{vol.mobile}</div>
+                        {vol.email && <div className="text-[10px] text-slate-400">{vol.email}</div>}
+                      </td>
+                      <td className="py-3 px-2 text-slate-500">{vol.availability || 'Weekends'}</td>
+                      <td className="py-3 px-2 text-right">
+                        <div className="flex items-center justify-end space-x-1.5">
+                          <button
+                            onClick={() => setEditingVolunteer(vol)}
+                            className="px-2.5 py-1 rounded-lg bg-blue-100 dark:bg-blue-950/80 text-blue-700 dark:text-blue-300 font-bold hover:bg-blue-200 dark:hover:bg-blue-900 transition-colors flex items-center space-x-1"
+                            title="Edit Data, Photo & Password"
+                          >
+                            <Edit className="w-3.5 h-3.5" />
+                            <span>Edit</span>
+                          </button>
+                          <button
+                            onClick={() => {
+                              if (confirm(`Are you sure you want to delete volunteer ${vol.fullName}?`)) {
+                                deleteVolunteerAdmin(vol.id);
+                              }
+                            }}
+                            className="p-1 rounded-lg text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-950/60 transition-colors"
+                            title="Delete Volunteer"
+                          >
+                            <Trash2 className="w-3.5 h-3.5" />
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
+              </tbody>
+            </table>
+            {(volunteersList || []).length === 0 && (
+              <div className="py-8 text-center text-slate-400 text-xs">No registered volunteers found.</div>
+            )}
           </div>
         </div>
       )}
@@ -528,7 +726,9 @@ export const AdminDashboard: React.FC = () => {
                       : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-700'
                   }`}
                 >
-                  {st === 'All' ? `All (${memberPosts.length})` : `${st} (${memberPosts.filter(p => p.status === st).length})`}
+                  {st === 'All' 
+                    ? `All (${(memberPosts || []).length})` 
+                    : `${st} (${(memberPosts || []).filter(p => (p.status || '').toLowerCase() === st).length})`}
                 </button>
               ))}
             </div>
@@ -536,12 +736,19 @@ export const AdminDashboard: React.FC = () => {
 
           {/* Posts List */}
           <div className="space-y-4">
-            {memberPosts
-              .filter(p => postStatusFilter === 'All' ? true : p.status === postStatusFilter)
+            {(memberPosts || [])
+              .filter(p => postStatusFilter === 'All' ? true : (p.status || '').toLowerCase() === postStatusFilter)
               .map((post) => {
-                const isPending = post.status === 'pending';
-                const isApproved = post.status === 'approved';
-                const isRejected = post.status === 'rejected';
+                const statusLower = (post.status || '').toLowerCase();
+                const isPending = statusLower === 'pending';
+                const isApproved = statusLower === 'approved';
+                const isRejected = statusLower === 'rejected';
+
+                const authorDisplayName = post.memberName || post.authorName || 'Portal Member';
+                const authorUsernameDisplay = post.memberUsername || post.authorUsername || 'member';
+                const authorRoleDisplay = post.memberRole || post.authorRole || 'Member';
+                const submittedDateDisplay = post.submittedDate || post.submittedAt || '';
+                const rejectionFeedback = post.rejectionReason || post.adminFeedback;
 
                 return (
                   <div
@@ -551,16 +758,18 @@ export const AdminDashboard: React.FC = () => {
                     <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-3">
                       <div className="flex items-start space-x-3">
                         <div className="w-10 h-10 rounded-full bg-emerald-100 dark:bg-emerald-950/60 text-[#006633] dark:text-emerald-400 flex items-center justify-center font-black text-sm shrink-0 border border-emerald-300 dark:border-emerald-800">
-                          {post.authorName[0]}
+                          {authorDisplayName[0] || 'P'}
                         </div>
                         <div>
                           <div className="flex flex-wrap items-center gap-2">
-                            <span className="font-extrabold text-sm text-slate-900 dark:text-white">{post.authorName}</span>
-                            <span className="text-xs font-mono text-emerald-700 dark:text-emerald-400">@{post.authorUsername}</span>
+                            <span className="font-extrabold text-sm text-slate-900 dark:text-white">{authorDisplayName}</span>
+                            <span className="text-xs font-mono text-emerald-700 dark:text-emerald-400">@{authorUsernameDisplay}</span>
                             <span className="text-[10px] uppercase font-black px-2 py-0.5 rounded-md bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300">
-                              {post.authorRole}
+                              {authorRoleDisplay}
                             </span>
-                            <span className="text-xs text-slate-400">• {post.submittedAt}</span>
+                            {submittedDateDisplay && (
+                              <span className="text-xs text-slate-400">• {submittedDateDisplay}</span>
+                            )}
                           </div>
                           <div className="text-xs text-slate-500 font-medium mt-0.5">
                             Category: <strong className="text-slate-700 dark:text-slate-300">{post.category}</strong>
@@ -609,9 +818,9 @@ export const AdminDashboard: React.FC = () => {
                         </div>
                       )}
 
-                      {isRejected && post.adminFeedback && (
+                      {isRejected && rejectionFeedback && (
                         <div className="p-3 bg-rose-50 dark:bg-rose-950/40 rounded-xl border border-rose-200 dark:border-rose-800 text-xs text-rose-800 dark:text-rose-300">
-                          <strong>Admin Feedback to Member:</strong> {post.adminFeedback}
+                          <strong>Admin Feedback to Member:</strong> {rejectionFeedback}
                         </div>
                       )}
                     </div>
@@ -665,7 +874,7 @@ export const AdminDashboard: React.FC = () => {
                 );
               })}
 
-            {memberPosts.filter(p => postStatusFilter === 'All' ? true : p.status === postStatusFilter).length === 0 && (
+            {(memberPosts || []).filter(p => postStatusFilter === 'All' ? true : (p.status || '').toLowerCase() === postStatusFilter).length === 0 && (
               <div className="p-12 text-center bg-white dark:bg-slate-900 rounded-3xl border border-dashed border-slate-200 dark:border-slate-800 text-slate-400 space-y-2">
                 <FileCheck className="w-10 h-10 text-slate-300 mx-auto" />
                 <p className="text-sm font-semibold">No member submissions match this filter.</p>
@@ -727,8 +936,13 @@ export const AdminDashboard: React.FC = () => {
           </div>
 
           <div className="space-y-4">
-            {mediaHeadMessages.map((msg) => {
+            {(mediaHeadMessages || []).map((msg) => {
               const currentReply = replyTextMap[msg.id] || '';
+              const senderDisplayName = msg.senderName || 'Member';
+              const senderUsernameDisplay = msg.senderUsername || 'user';
+              const senderRoleDisplay = msg.senderRole || 'Member';
+              const dateDisplay = msg.date || msg.sentAt || '';
+              const repliedDateDisplay = msg.repliedDate || msg.repliedAt || '';
 
               return (
                 <div
@@ -742,17 +956,17 @@ export const AdminDashboard: React.FC = () => {
                   <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
                     <div className="flex items-center space-x-3">
                       <div className="w-10 h-10 rounded-full bg-[#006633] text-white flex items-center justify-center font-black text-sm">
-                        {msg.senderName[0]}
+                        {senderDisplayName[0] || 'M'}
                       </div>
                       <div>
                         <div className="flex items-center space-x-2">
-                          <span className="font-extrabold text-sm text-slate-900 dark:text-white">{msg.senderName}</span>
-                          <span className="text-xs font-mono text-emerald-700 dark:text-emerald-400">@{msg.senderUsername}</span>
+                          <span className="font-extrabold text-sm text-slate-900 dark:text-white">{senderDisplayName}</span>
+                          <span className="text-xs font-mono text-emerald-700 dark:text-emerald-400">@{senderUsernameDisplay}</span>
                           <span className="text-[10px] uppercase font-black px-2 py-0.5 rounded-md bg-emerald-100 dark:bg-emerald-900 text-emerald-900 dark:text-emerald-200">
-                            {msg.senderRole}
+                            {senderRoleDisplay}
                           </span>
                         </div>
-                        <div className="text-xs text-slate-400">{msg.sentAt}</div>
+                        {dateDisplay && <div className="text-xs text-slate-400">{dateDisplay}</div>}
                       </div>
                     </div>
 
@@ -775,7 +989,7 @@ export const AdminDashboard: React.FC = () => {
                     <div className="p-4 bg-emerald-100/70 dark:bg-emerald-950/70 rounded-2xl border border-emerald-300 dark:border-emerald-800 text-xs space-y-1">
                       <div className="font-bold text-emerald-900 dark:text-emerald-200 flex items-center justify-between">
                         <span>✓ Response from Media Cell Head:</span>
-                        <span className="text-slate-400 font-normal">{msg.repliedAt}</span>
+                        {repliedDateDisplay && <span className="text-slate-400 font-normal">{repliedDateDisplay}</span>}
                       </div>
                       <p className="text-slate-700 dark:text-slate-300">{msg.reply}</p>
                     </div>
@@ -817,10 +1031,10 @@ export const AdminDashboard: React.FC = () => {
               );
             })}
 
-            {mediaHeadMessages.length === 0 && (
+            {(mediaHeadMessages || []).length === 0 && (
               <div className="p-12 text-center bg-white dark:bg-slate-900 rounded-3xl border border-dashed border-slate-200 dark:border-slate-800 text-slate-400 space-y-2">
                 <MessageSquare className="w-10 h-10 text-slate-300 mx-auto" />
-                <p className="text-sm font-semibold">No direct messages received from members yet.</p>
+                <p className="text-sm font-semibold">No direct messages received yet.</p>
               </div>
             )}
           </div>
@@ -867,7 +1081,7 @@ export const AdminDashboard: React.FC = () => {
               </div>
               <h3 className="text-xl font-black text-slate-900 dark:text-white">Change Login ID & Password</h3>
               <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
-                Update the master credentials used to unlock the /superadmin portal.
+                Update the master credentials used to unlock the admin portal.
               </p>
             </div>
 
@@ -940,7 +1154,7 @@ export const AdminDashboard: React.FC = () => {
                       type="text"
                       value={newUsername}
                       onChange={(e) => setNewUsername(e.target.value)}
-                      placeholder="e.g. superadmin"
+                      placeholder="e.g. admin"
                       className="w-full pl-10 pr-4 py-2.5 bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-xl text-xs font-medium text-slate-900 dark:text-white focus:ring-2 focus:ring-emerald-500 focus:outline-none"
                       required
                     />
@@ -996,41 +1210,8 @@ export const AdminDashboard: React.FC = () => {
             </form>
           </div>
 
-          {/* Right Sidebar: Direct Link & Portal Stats */}
+          {/* Right Sidebar: Storage & Backup */}
           <div className="space-y-6">
-            {/* Direct Superadmin Link Card */}
-            <div className="bg-white dark:bg-slate-900 p-6 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-sm space-y-4">
-              <h4 className="font-bold text-sm text-slate-900 dark:text-white flex items-center space-x-2">
-                <Globe className="w-4 h-4 text-emerald-600" />
-                <span>Super Admin URL</span>
-              </h4>
-              <p className="text-xs text-slate-500 dark:text-slate-400">
-                The admin portal is hidden from public navigation menus. Bookmark or use this direct link to open the login portal:
-              </p>
-              
-              <div className="p-3 bg-slate-50 dark:bg-slate-800/80 rounded-xl border border-slate-200 dark:border-slate-700 flex items-center justify-between font-mono text-xs text-emerald-700 dark:text-emerald-400 break-all">
-                <span>{window.location.origin + window.location.pathname}#superadmin</span>
-                <button
-                  onClick={() => {
-                    const url = `${window.location.origin}${window.location.pathname}#superadmin`;
-                    navigator.clipboard.writeText(url);
-                    setCopiedLink(true);
-                    addToast("Super Admin URL copied to clipboard!", "success");
-                    setTimeout(() => setCopiedLink(false), 2500);
-                  }}
-                  className="ml-2 p-1.5 rounded-lg bg-emerald-100 dark:bg-emerald-950 text-emerald-800 dark:text-emerald-300 hover:bg-emerald-200 transition-colors shrink-0"
-                  title="Copy Link"
-                >
-                  {copiedLink ? <CheckCheck className="w-4 h-4 text-emerald-600" /> : <Copy className="w-4 h-4" />}
-                </button>
-              </div>
-
-              <div className="text-[11px] text-slate-400 space-y-1">
-                <p>• Supported paths: <code className="text-slate-600 dark:text-slate-300">/superadmin</code>, <code className="text-slate-600 dark:text-slate-300">#superadmin</code></p>
-                <p>• Unauthorized visits will always see the login prompt.</p>
-              </div>
-            </div>
-
             {/* Storage Info */}
             <div className="bg-slate-50 dark:bg-slate-900/60 p-6 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-sm space-y-3">
               <h4 className="font-bold text-xs uppercase tracking-wider text-slate-500 dark:text-slate-400">
@@ -1065,6 +1246,32 @@ export const AdminDashboard: React.FC = () => {
 
           </div>
         </div>
+      )}
+
+      {/* Edit Member Modal */}
+      {editingMember && (
+        <EditMemberModal
+          member={editingMember}
+          isOpen={!!editingMember}
+          onClose={() => setEditingMember(null)}
+          onSave={(id, updates) => {
+            updateMemberAdmin(id, updates);
+            setEditingMember(null);
+          }}
+        />
+      )}
+
+      {/* Edit Volunteer Modal */}
+      {editingVolunteer && (
+        <EditVolunteerModal
+          volunteer={editingVolunteer}
+          isOpen={!!editingVolunteer}
+          onClose={() => setEditingVolunteer(null)}
+          onSave={(id, updates) => {
+            updateVolunteerAdmin(id, updates);
+            setEditingVolunteer(null);
+          }}
+        />
       )}
 
     </div>

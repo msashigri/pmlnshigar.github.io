@@ -9,7 +9,7 @@ export const ProjectsPage: React.FC = () => {
 
   const statuses = ['All', 'Ongoing', 'Completed', 'Planned'];
 
-  const filteredProjects = projectsList.filter(item => 
+  const filteredProjects = (projectsList || []).filter(item => 
     activeStatus === 'All' || item.status === activeStatus
   );
 

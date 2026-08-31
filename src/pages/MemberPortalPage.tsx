@@ -43,6 +43,9 @@ export const MemberPortalPage: React.FC = () => {
   const [profileOccupation, setProfileOccupation] = useState(('occupation' in (currentMemberUser || {}) ? (currentMemberUser as any).occupation : '') || '');
   const [profileBio, setProfileBio] = useState(('bio' in (currentMemberUser || {}) ? (currentMemberUser as any).bio : '') || '');
   const [profilePhoto, setProfilePhoto] = useState(currentMemberUser?.photoUrl || '');
+  const [profileUsername, setProfileUsername] = useState(currentMemberUser?.username || '');
+  const [profilePassword, setProfilePassword] = useState(currentMemberUser?.password || '');
+  const [showProfilePassword, setShowProfilePassword] = useState(false);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
 
   // New Post Submission State
@@ -67,6 +70,8 @@ export const MemberPortalPage: React.FC = () => {
       setProfileOccupation(('occupation' in currentMemberUser ? (currentMemberUser as any).occupation : '') || '');
       setProfileBio(('bio' in currentMemberUser ? (currentMemberUser as any).bio : '') || '');
       setProfilePhoto(currentMemberUser.photoUrl || '');
+      setProfileUsername(currentMemberUser.username || '');
+      setProfilePassword(currentMemberUser.password || '');
     }
   }, [currentMemberUser]);
 
@@ -81,15 +86,8 @@ export const MemberPortalPage: React.FC = () => {
 
     const success = loginMember(loginUsername, loginPassword);
     if (!success) {
-      setLoginError('Invalid Username ID or Password. Try demo accounts below or register as a new member.');
+      setLoginError('Invalid Username / ID or Password. Please verify your credentials or register a new account.');
     }
-  };
-
-  // Quick Demo Login Helper
-  const handleQuickLogin = (user: string, pass: string) => {
-    setLoginUsername(user);
-    setLoginPassword(pass);
-    loginMember(user, pass);
   };
 
   // Profile Photo Upload from Device
@@ -121,7 +119,9 @@ export const MemberPortalPage: React.FC = () => {
       village: profileVillage,
       occupation: profileOccupation,
       bio: profileBio,
-      photoUrl: profilePhoto
+      photoUrl: profilePhoto,
+      username: profileUsername.trim(),
+      password: profilePassword.trim()
     });
   };
 
@@ -231,12 +231,21 @@ export const MemberPortalPage: React.FC = () => {
   };
 
   // Filter posts & messages for the active logged in member
-  const myPosts = memberPostsList.filter(
-    p => currentMemberUser && (p.memberId === currentMemberUser.id || p.memberUsername === currentMemberUser.username)
+  const myPosts = (memberPostsList || []).filter(
+    p => currentMemberUser && (
+      p.memberId === currentMemberUser.id || 
+      p.memberUsername === currentMemberUser.username || 
+      p.authorUsername === currentMemberUser.username ||
+      (currentMemberUser.username && (p.memberUsername?.toLowerCase() === currentMemberUser.username.toLowerCase()))
+    )
   );
 
-  const myMessages = mediaMessagesList.filter(
-    m => currentMemberUser && (m.senderId === currentMemberUser.id || m.senderUsername === currentMemberUser.username)
+  const myMessages = (mediaMessagesList || []).filter(
+    m => currentMemberUser && (
+      m.senderId === currentMemberUser.id || 
+      m.senderUsername === currentMemberUser.username ||
+      (currentMemberUser.username && (m.senderUsername?.toLowerCase() === currentMemberUser.username.toLowerCase()))
+    )
   );
 
   // -------------------------------------------------------------
@@ -335,32 +344,6 @@ export const MemberPortalPage: React.FC = () => {
               <ArrowRight className="w-4 h-4" />
             </button>
           </form>
-
-          {/* Quick Demo Logins for easy testing */}
-          <div className="border-t border-slate-200 dark:border-slate-800 pt-4 space-y-2">
-            <div className="text-[11px] font-bold text-slate-500 uppercase tracking-wider text-center">
-              Quick Test Accounts
-            </div>
-            <div className="grid grid-cols-2 gap-2">
-              <button
-                type="button"
-                onClick={() => handleQuickLogin('aliraza@pmlnmediacellshigar.online', 'member123')}
-                className="p-2 rounded-lg bg-slate-100 hover:bg-emerald-50 dark:bg-slate-800 dark:hover:bg-slate-700/80 border border-slate-200 dark:border-slate-700 text-left transition-colors"
-              >
-                <div className="text-xs font-bold text-slate-900 dark:text-white">Ali Raza (Member)</div>
-                <div className="text-[10px] text-slate-500 font-mono">aliraza@...</div>
-              </button>
-
-              <button
-                type="button"
-                onClick={() => handleQuickLogin('fatimabatool@pmlnmediacellshigar.online', 'volunteer123')}
-                className="p-2 rounded-lg bg-slate-100 hover:bg-emerald-50 dark:bg-slate-800 dark:hover:bg-slate-700/80 border border-slate-200 dark:border-slate-700 text-left transition-colors"
-              >
-                <div className="text-xs font-bold text-slate-900 dark:text-white">Fatima (Volunteer)</div>
-                <div className="text-[10px] text-slate-500 font-mono">fatimabatool@...</div>
-              </button>
-            </div>
-          </div>
 
           {/* New Member Registration CTAs */}
           <div className="border-t border-slate-200 dark:border-slate-800 pt-4 text-center text-xs text-slate-600 dark:text-slate-400 space-y-2">
@@ -815,6 +798,60 @@ export const MemberPortalPage: React.FC = () => {
                   placeholder="https://..."
                   className="w-full bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-xl px-3.5 py-2.5 text-xs text-slate-900 dark:text-white focus:outline-none focus:border-emerald-500 font-semibold"
                 />
+              </div>
+
+              {/* SECTION: MEMBER PORTAL LOGIN CREDENTIALS */}
+              <div className="sm:col-span-2 p-4 bg-emerald-50/70 dark:bg-emerald-950/30 rounded-2xl border-2 border-emerald-500/30 dark:border-emerald-800/50 space-y-3">
+                <div className="flex items-center space-x-2 text-emerald-900 dark:text-emerald-300">
+                  <Lock className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
+                  <h4 className="text-xs font-black uppercase tracking-wider">
+                    Member Portal Login Credentials
+                  </h4>
+                </div>
+                <p className="text-[11px] text-slate-600 dark:text-slate-400">
+                  Your official portal Username ID and Password. You can edit them below to update your login credentials.
+                </p>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-1">
+                  <div>
+                    <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">
+                      Portal Login ID / Username
+                    </label>
+                    <div className="relative">
+                      <User className="w-4 h-4 text-slate-400 absolute left-3 top-3" />
+                      <input
+                        type="text"
+                        value={profileUsername}
+                        onChange={(e) => setProfileUsername(e.target.value)}
+                        placeholder="e.g. member@pmlnmediacellshigar.online"
+                        className="w-full pl-9 pr-3.5 py-2.5 bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-600 rounded-xl text-xs font-mono font-bold text-emerald-900 dark:text-emerald-300 focus:ring-2 focus:ring-emerald-500 focus:outline-none"
+                      />
+                    </div>
+                  </div>
+
+                  <div>
+                    <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">
+                      Portal Password
+                    </label>
+                    <div className="relative">
+                      <Lock className="w-4 h-4 text-slate-400 absolute left-3 top-3" />
+                      <input
+                        type={showProfilePassword ? "text" : "password"}
+                        value={profilePassword}
+                        onChange={(e) => setProfilePassword(e.target.value)}
+                        placeholder="Enter your portal password..."
+                        className="w-full pl-9 pr-9 py-2.5 bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-600 rounded-xl text-xs font-mono font-bold text-slate-900 dark:text-white focus:ring-2 focus:ring-emerald-500 focus:outline-none"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => setShowProfilePassword(!showProfilePassword)}
+                        className="absolute right-2.5 top-3 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200"
+                      >
+                        {showProfilePassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                      </button>
+                    </div>
+                  </div>
+                </div>
               </div>
 
               <div className="sm:col-span-2">

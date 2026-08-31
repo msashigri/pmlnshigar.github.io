@@ -24,9 +24,23 @@ export const SearchModal: React.FC = () => {
 
   const query = searchQuery.toLowerCase().trim();
 
-  const filteredNews = query ? newsList.filter(n => n.title.toLowerCase().includes(query) || n.summary.toLowerCase().includes(query) || n.tags.some(t => t.toLowerCase().includes(query))) : [];
-  const filteredEvents = query ? eventsList.filter(e => e.title.toLowerCase().includes(query) || e.venue.toLowerCase().includes(query) || e.description.toLowerCase().includes(query)) : [];
-  const filteredProjects = query ? projectsList.filter(p => p.title.toLowerCase().includes(query) || p.summary.toLowerCase().includes(query) || p.category.toLowerCase().includes(query)) : [];
+  const filteredNews = query ? (newsList || []).filter(n => 
+    (n.title || '').toLowerCase().includes(query) || 
+    (n.summary || '').toLowerCase().includes(query) || 
+    (n.tags || []).some(t => (t || '').toLowerCase().includes(query))
+  ) : [];
+  
+  const filteredEvents = query ? (eventsList || []).filter(e => 
+    (e.title || '').toLowerCase().includes(query) || 
+    (e.venue || '').toLowerCase().includes(query) || 
+    (e.description || '').toLowerCase().includes(query)
+  ) : [];
+  
+  const filteredProjects = query ? (projectsList || []).filter(p => 
+    (p.title || '').toLowerCase().includes(query) || 
+    (p.summary || '').toLowerCase().includes(query) || 
+    (p.category || '').toLowerCase().includes(query)
+  ) : [];
 
   const handleSelectPage = (page: Page) => {
     setCurrentPage(page);

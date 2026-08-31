@@ -123,15 +123,21 @@ export interface MemberPost {
   memberId: string;
   memberName: string;
   memberUsername: string;
-  memberRole?: 'Member' | 'Volunteer';
+  memberRole?: 'Member' | 'Volunteer' | string;
   title: string;
   category: 'Press Releases' | 'Events' | 'Development Projects' | 'Political Activities' | 'Announcements';
   summary: string;
   content: string;
   imageUrl?: string;
-  status: 'Pending' | 'Approved' | 'Rejected';
+  status: 'Pending' | 'Approved' | 'Rejected' | 'pending' | 'approved' | 'rejected';
   submittedDate: string;
   rejectionReason?: string;
+  // Compatibility aliases
+  authorName?: string;
+  authorUsername?: string;
+  authorRole?: string;
+  submittedAt?: string;
+  adminFeedback?: string;
 }
 
 export interface MediaHeadMessage {
@@ -139,14 +145,17 @@ export interface MediaHeadMessage {
   senderId: string;
   senderName: string;
   senderUsername: string;
-  senderRole: 'Member' | 'Volunteer';
+  senderRole: 'Member' | 'Volunteer' | string;
   subject: string;
   message: string;
   date: string;
   isRead: boolean;
-  status: 'Received' | 'Reviewed' | 'Replied';
+  status: 'Received' | 'Reviewed' | 'Replied' | string;
   reply?: string;
   repliedDate?: string;
+  // Compatibility aliases
+  sentAt?: string;
+  repliedAt?: string;
 }
 
 export interface DonationRecord {

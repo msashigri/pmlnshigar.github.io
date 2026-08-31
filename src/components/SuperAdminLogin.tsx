@@ -48,10 +48,6 @@ export const SuperAdminLogin: React.FC = () => {
             <ArrowLeft className="w-4 h-4" />
             <span>Return to Public Website</span>
           </button>
-
-          <span className="text-xs font-mono text-emerald-500 bg-emerald-950/80 border border-emerald-800 px-2.5 py-0.5 rounded-full">
-            /superadmin
-          </span>
         </div>
 
         {/* Login Card */}
