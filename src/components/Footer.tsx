@@ -93,6 +93,12 @@ export const Footer: React.FC = () => {
                 </button>
               </li>
               <li>
+                <button onClick={() => navTo('member-portal')} className="hover:text-emerald-300 font-bold text-amber-400 transition-colors flex items-center space-x-2">
+                  <ArrowRight className="w-3 h-3 text-amber-400" />
+                  <span>Member & Volunteer Portal</span>
+                </button>
+              </li>
+              <li>
                 <button onClick={() => navTo('join')} className="hover:text-white font-bold text-emerald-400 transition-colors flex items-center space-x-2">
                   <ArrowRight className="w-3 h-3 text-white" />
                   <span>Online Membership Form</span>
@@ -174,6 +180,14 @@ export const Footer: React.FC = () => {
             <button onClick={() => navTo('about')} className="hover:text-slate-300 transition-colors">Privacy Policy</button>
             <span>•</span>
             <button onClick={() => navTo('about')} className="hover:text-slate-300 transition-colors">Terms of Membership</button>
+            <span>•</span>
+            <button 
+              onClick={() => navTo('admin')} 
+              className="text-slate-600 hover:text-emerald-400 transition-colors inline-flex items-center space-x-1"
+              title="Secretariat Portal Gateway"
+            >
+              <span>Secretariat</span>
+            </button>
             <span>•</span>
             <span className="text-slate-400 flex items-center space-x-1">
               <span>Developed for Shigar</span>

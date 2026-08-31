@@ -23,6 +23,7 @@ import { DonationPage } from './pages/DonationPage';
 import { MediaPage } from './pages/MediaPage';
 import { ContactPage } from './pages/ContactPage';
 import { AdminDashboard } from './pages/AdminDashboard';
+import { MemberPortalPage } from './pages/MemberPortalPage';
 
 const MainContent: React.FC = () => {
   const { currentPage } = useApp();
@@ -57,6 +58,8 @@ const MainContent: React.FC = () => {
         return <ContactPage />;
       case 'admin':
         return <AdminDashboard />;
+      case 'member-portal':
+        return <MemberPortalPage />;
       default:
         return <HomePage />;
     }

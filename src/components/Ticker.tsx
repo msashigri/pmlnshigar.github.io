@@ -51,24 +51,6 @@ export const Ticker: React.FC = () => {
           >
             {isDarkMode ? <Sun className="w-3.5 h-3.5 text-emerald-200" /> : <Moon className="w-3.5 h-3.5 text-emerald-200" />}
           </button>
-
-          <span className="text-emerald-700">|</span>
-
-          {/* Admin Toggle */}
-          <button 
-            onClick={() => {
-              if (isAdmin) {
-                setIsAdmin(false);
-                setCurrentPage('home');
-              } else {
-                setCurrentPage('admin');
-              }
-            }}
-            className="flex items-center space-x-1 text-emerald-200 font-semibold hover:text-white hover:underline"
-          >
-            <Shield className="w-3 h-3" />
-            <span>{isAdmin ? 'Exit Admin' : 'Admin Portal'}</span>
-          </button>
         </div>
       </div>
     </div>

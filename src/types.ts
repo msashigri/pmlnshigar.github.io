@@ -12,7 +12,15 @@ export type Page =
   | 'donate' 
   | 'media' 
   | 'contact' 
-  | 'admin';
+  | 'admin'
+  | 'member-portal';
+
+export interface AdminCredentials {
+  username: string;
+  passwordHash?: string;
+  password?: string;
+  lastUpdated?: string;
+}
 
 export interface NewsItem {
   id: string;
@@ -83,6 +91,8 @@ export interface MemberRecord {
   dob: string;
   mobile: string;
   email: string;
+  username?: string;
+  password?: string;
   village: string;
   tehsil: string;
   district: string;
@@ -90,6 +100,7 @@ export interface MemberRecord {
   joinedDate: string;
   status: 'Active' | 'Pending' | 'Verified';
   photoUrl?: string;
+  bio?: string;
 }
 
 export interface VolunteerRecord {
@@ -97,11 +108,45 @@ export interface VolunteerRecord {
   fullName: string;
   mobile: string;
   email: string;
+  username?: string;
+  password?: string;
   village: string;
   preferredRole: string;
   availability: string;
   status: 'Pending' | 'Approved';
   registeredDate: string;
+  photoUrl?: string;
+}
+
+export interface MemberPost {
+  id: string;
+  memberId: string;
+  memberName: string;
+  memberUsername: string;
+  memberRole?: 'Member' | 'Volunteer';
+  title: string;
+  category: 'Press Releases' | 'Events' | 'Development Projects' | 'Political Activities' | 'Announcements';
+  summary: string;
+  content: string;
+  imageUrl?: string;
+  status: 'Pending' | 'Approved' | 'Rejected';
+  submittedDate: string;
+  rejectionReason?: string;
+}
+
+export interface MediaHeadMessage {
+  id: string;
+  senderId: string;
+  senderName: string;
+  senderUsername: string;
+  senderRole: 'Member' | 'Volunteer';
+  subject: string;
+  message: string;
+  date: string;
+  isRead: boolean;
+  status: 'Received' | 'Reviewed' | 'Replied';
+  reply?: string;
+  repliedDate?: string;
 }
 
 export interface DonationRecord {

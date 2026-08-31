@@ -1,4 +1,4 @@
-import { NewsItem, EventItem, GalleryItem, DevelopmentProject, ManifestoPillar, MemberRecord, VolunteerRecord, DonationRecord, ContactMessage } from '../types';
+import { NewsItem, EventItem, GalleryItem, DevelopmentProject, ManifestoPillar, MemberRecord, VolunteerRecord, DonationRecord, ContactMessage, MemberPost, MediaHeadMessage } from '../types';
 import { APP_IMAGES } from '../assets/images';
 
 export const LEADER_INFO = {
@@ -398,12 +398,15 @@ export const INITIAL_MEMBERS: MemberRecord[] = [
     dob: "1994-05-12",
     mobile: "+92 345 9876543",
     email: "ali.raza@gmail.com",
+    username: "aliraza@pmlnmediacellshigar.online",
+    password: "Member@2026",
     village: "Shigar Town",
     tehsil: "Shigar",
     district: "Shigar",
     occupation: "Civil Engineer",
     joinedDate: "2026-01-15",
     status: "Verified",
+    bio: "Passionate community worker & civil engineer dedicated to youth empowerment and sustainable mountain infrastructure in Shigar.",
     photoUrl: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=400&q=80"
   },
   {
@@ -416,12 +419,15 @@ export const INITIAL_MEMBERS: MemberRecord[] = [
     dob: "1998-09-20",
     mobile: "+92 346 1122334",
     email: "fatima.b@gmail.com",
+    username: "fatimabatool@pmlnmediacellshigar.online",
+    password: "Member@2026",
     village: "Gulabpur",
     tehsil: "Shigar",
     district: "Shigar",
     occupation: "Teacher",
     joinedDate: "2026-02-04",
     status: "Verified",
+    bio: "Education activist working to promote female literacy and digital skills across Gulabpur and Tissar.",
     photoUrl: "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&w=400&q=80"
   }
 ];
@@ -432,22 +438,28 @@ export const INITIAL_VOLUNTEERS: VolunteerRecord[] = [
     fullName: "Khadim Hussain",
     mobile: "+92 355 4433221",
     email: "khadim.hussain@outlook.com",
+    username: "khadim@pmlnmediacellshigar.online",
+    password: "Volunteer@2026",
     village: "Marapi",
     preferredRole: "Field Coordinator",
     availability: "Weekends & Evenings",
     status: "Approved",
-    registeredDate: "2026-06-10"
+    registeredDate: "2026-06-10",
+    photoUrl: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=400&q=80"
   },
   {
     id: "vol-2",
     fullName: "Zainab Bano",
     mobile: "+92 342 9988776",
     email: "zainab.b@gmail.com",
+    username: "zainab@pmlnmediacellshigar.online",
+    password: "Volunteer@2026",
     village: "Tissar",
     preferredRole: "Social Media Campaigner",
     availability: "Flexible",
     status: "Approved",
-    registeredDate: "2026-07-01"
+    registeredDate: "2026-07-01",
+    photoUrl: "https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&w=400&q=80"
   }
 ];
 
@@ -495,5 +507,51 @@ export const INITIAL_CONTACT_MESSAGES: ContactMessage[] = [
     village: "Basha",
     date: "2026-07-24",
     isRead: false
+  }
+];
+
+export const INITIAL_MEMBER_POSTS: MemberPost[] = [
+  {
+    id: "post-1",
+    memberId: "mem-101",
+    memberName: "Ali Raza Shigri",
+    memberUsername: "aliraza@pmlnmediacellshigar.online",
+    memberRole: "Member",
+    title: "Youth Cleanliness & Tree Plantation Drive Completed in Shigar Bazaar",
+    category: "Political Activities",
+    summary: "Over 80 local PMLN youth volunteers gathered to plant 500 pine trees and clean main commercial walkways in Shigar Town.",
+    content: `Under the leadership of Muhammad Tahir Unahar Shigri, PMLN youth members conducted an inspiring green campaign in Shigar Town. The initiative received immense appreciation from local merchants, tourists, and community elders. We distributed eco-friendly dustbins and planted 500 saplings across school areas.`,
+    imageUrl: "https://images.unsplash.com/photo-1542601906990-b4d3fb778b09?auto=format&fit=crop&w=1000&q=80",
+    status: "Pending",
+    submittedDate: "2026-07-26"
+  },
+  {
+    id: "post-2",
+    memberId: "mem-102",
+    memberName: "Fatima Batool",
+    memberUsername: "fatimabatool@pmlnmediacellshigar.online",
+    memberRole: "Member",
+    title: "Female Literacy Awareness Workshop Conducted in Gulabpur",
+    category: "Announcements",
+    summary: "A 2-day skill workshop focusing on basic English and digital literacy for high school girls in Gulabpur.",
+    content: `Education is the foundation of Shigar's future. Thanks to the support of PMLN Shigar Education Wing, our team trained 45 young female students in digital research and scholarship application procedures.`,
+    imageUrl: "https://images.unsplash.com/photo-1524178232363-1fb2b075b655?auto=format&fit=crop&w=1000&q=80",
+    status: "Approved",
+    submittedDate: "2026-07-20"
+  }
+];
+
+export const INITIAL_MEDIA_MESSAGES: MediaHeadMessage[] = [
+  {
+    id: "media-msg-1",
+    senderId: "mem-101",
+    senderName: "Ali Raza Shigri",
+    senderUsername: "aliraza@pmlnmediacellshigar.online",
+    senderRole: "Member",
+    subject: "HD Photography & Drone Coverage for Upcoming Rally in Tissar",
+    message: "Respected Social Media Team Head, our local youth team in Shigar has arranged high-definition drone cameras and ground photographers for the upcoming rally. Kindly coordinate with us for real-time live streaming on the official PMLN Shigar Facebook page.",
+    date: "2026-07-25",
+    isRead: false,
+    status: "Received"
   }
 ];
