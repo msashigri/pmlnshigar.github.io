@@ -164,7 +164,7 @@ export const ContactPage: React.FC = () => {
                 <Phone className="w-5 h-5 text-emerald-400 shrink-0" />
                 <div>
                   <div className="font-bold text-white">Telephone Helpline</div>
-                  <p>+92 5812 450123 / +92 345 9876543</p>
+                  <p>+92 0000 000000 / +92 000 0000000</p>
                 </div>
               </div>
 
@@ -172,7 +172,7 @@ export const ContactPage: React.FC = () => {
                 <Mail className="w-5 h-5 text-emerald-400 shrink-0" />
                 <div>
                   <div className="font-bold text-white">Official Email</div>
-                  <p>info@pmlnshigar.org / secretariat@pmlnshigar.org</p>
+                  <p>info@pmlnmediacellshigar.online / secretariat@pmlnmediacellshigar.online</p>
                 </div>
               </div>
 

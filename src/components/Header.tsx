@@ -1,11 +1,11 @@
 import React, { useState } from 'react';
-import { Menu, X, ChevronDown, User, HeartHandshake, Flag, Award, BookOpen, Layers, Newspaper, Calendar, Image as ImageIcon, Phone, Home, ShieldCheck } from 'lucide-react';
+import { Menu, X, ChevronDown, User, HeartHandshake, Flag, Award, BookOpen, Layers, Newspaper, Calendar, Image as ImageIcon, Phone, Home, Lock } from 'lucide-react';
 import { useApp } from '../context/AppContext';
 import { Page } from '../types';
 import { APP_IMAGES } from '../assets/images';
 
 export const Header: React.FC = () => {
-  const { currentPage, setCurrentPage, isAdmin } = useApp();
+  const { currentPage, setCurrentPage } = useApp();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [megaMenuOpen, setMegaMenuOpen] = useState(false);
 
@@ -43,6 +43,8 @@ export const Header: React.FC = () => {
                 src={APP_IMAGES.pmlnLogo}
                 alt="PMLN Shigar Official Logo"
                 className="w-full h-full object-cover rounded-full"
+                loading="eager"
+                decoding="async"
                 referrerPolicy="no-referrer"
               />
             </div>
@@ -108,6 +110,19 @@ export const Header: React.FC = () => {
                   </button>
 
                   <button
+                    onClick={() => handleNavClick('member-portal')}
+                    className="w-full text-left px-3 py-2.5 rounded-lg hover:bg-emerald-50 dark:hover:bg-slate-800 flex items-center space-x-3 transition-colors text-slate-800 dark:text-slate-100 font-medium text-sm"
+                  >
+                    <div className="w-8 h-8 rounded-lg bg-emerald-100 dark:bg-emerald-900/50 flex items-center justify-center text-[#006633] dark:text-emerald-400">
+                      <Lock className="w-4 h-4" />
+                    </div>
+                    <div>
+                      <div className="font-semibold text-slate-900 dark:text-slate-100">Member Portal Login</div>
+                      <div className="text-xs text-slate-500 dark:text-slate-400">Card & member dashboard</div>
+                    </div>
+                  </button>
+
+                  <button
                     onClick={() => handleNavClick('volunteer')}
                     className="w-full text-left px-3 py-2.5 rounded-lg hover:bg-emerald-50 dark:hover:bg-slate-800 flex items-center space-x-3 transition-colors text-slate-800 dark:text-slate-100 font-medium text-sm"
                   >
@@ -150,8 +165,16 @@ export const Header: React.FC = () => {
             </div>
           </nav>
 
-          {/* Action CTAs */}
-          <div className="hidden sm:flex items-center space-x-3">
+          {/* Action CTAs - Same Format for Member Login & Join Party */}
+          <div className="hidden sm:flex items-center space-x-2.5">
+            <button
+              onClick={() => handleNavClick('member-portal')}
+              className="px-4 py-2 rounded-lg font-bold text-xs uppercase tracking-wider text-white bg-emerald-800 hover:bg-emerald-900 dark:bg-emerald-800 dark:hover:bg-emerald-700 shadow-md shadow-emerald-950/20 hover:shadow-lg transition-all flex items-center space-x-1.5"
+            >
+              <Lock className="w-3.5 h-3.5 text-emerald-200" />
+              <span>Member Login</span>
+            </button>
+
             <button
               onClick={() => handleNavClick('join')}
               className="px-4 py-2 rounded-lg font-bold text-xs uppercase tracking-wider text-white bg-[#006633] hover:bg-[#004d26] shadow-md shadow-emerald-900/20 hover:shadow-lg transition-all flex items-center space-x-1.5"
@@ -161,11 +184,26 @@ export const Header: React.FC = () => {
             </button>
           </div>
 
-          {/* Mobile Menu Toggle Button */}
-          <div className="flex items-center space-x-2 xl:hidden">
+          {/* Mobile Menu & Quick CTAs */}
+          <div className="flex items-center space-x-1.5 xl:hidden">
+            <button
+              onClick={() => handleNavClick('member-portal')}
+              className="px-2.5 py-1.5 rounded-lg text-xs font-bold text-white bg-emerald-800 hover:bg-emerald-900 flex items-center space-x-1 shadow-sm sm:hidden"
+            >
+              <Lock className="w-3 h-3" />
+              <span>Login</span>
+            </button>
+            <button
+              onClick={() => handleNavClick('join')}
+              className="px-2.5 py-1.5 rounded-lg text-xs font-bold text-white bg-[#006633] hover:bg-[#004d26] flex items-center space-x-1 shadow-sm sm:hidden"
+            >
+              <Flag className="w-3 h-3" />
+              <span>Join</span>
+            </button>
             <button
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
               className="p-2 rounded-lg text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 focus:outline-none"
+              aria-label="Toggle navigation menu"
             >
               {mobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
             </button>
@@ -193,18 +231,21 @@ export const Header: React.FC = () => {
             </button>
           ))}
 
+          {/* Mobile Action Buttons in matching format */}
           <div className="pt-4 border-t border-slate-100 dark:border-slate-800 grid grid-cols-2 gap-2">
             <button
-              onClick={() => handleNavClick('join')}
-              className="w-full py-2.5 rounded-lg font-bold text-sm bg-[#006633] text-white text-center shadow"
+              onClick={() => handleNavClick('member-portal')}
+              className="w-full py-2.5 rounded-lg font-bold text-xs uppercase tracking-wider bg-emerald-800 hover:bg-emerald-900 text-white text-center shadow flex items-center justify-center space-x-1.5"
             >
-              Join Party
+              <Lock className="w-3.5 h-3.5 text-emerald-200" />
+              <span>Member Login</span>
             </button>
             <button
-              onClick={() => handleNavClick('volunteer')}
-              className="w-full py-2.5 rounded-lg font-bold text-sm bg-emerald-800 text-white text-center shadow"
+              onClick={() => handleNavClick('join')}
+              className="w-full py-2.5 rounded-lg font-bold text-xs uppercase tracking-wider bg-[#006633] hover:bg-[#004d26] text-white text-center shadow flex items-center justify-center space-x-1.5"
             >
-              Volunteer
+              <Flag className="w-3.5 h-3.5 text-white" />
+              <span>Join Party</span>
             </button>
           </div>
         </div>

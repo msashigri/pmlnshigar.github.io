@@ -20,9 +20,9 @@ export const Ticker: React.FC = () => {
 
         {/* Right: Quick Tools */}
         <div className="flex items-center space-x-4 shrink-0 text-emerald-100">
-          <a href="tel:+925812450123" className="hidden lg:flex items-center space-x-1 hover:text-white transition-colors">
+          <a href="tel:+920000000000" className="hidden lg:flex items-center space-x-1 hover:text-white transition-colors">
             <Phone className="w-3 h-3 text-emerald-300" />
-            <span>+92 5812 450123</span>
+            <span>+92 000 0000000</span>
           </a>
           <span className="hidden lg:inline text-emerald-700">|</span>
           <div className="flex items-center space-x-1">
